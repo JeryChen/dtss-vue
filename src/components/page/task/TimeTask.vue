@@ -50,44 +50,44 @@
         </el-tooltip>
       </div>
       <el-table :data="tableData" stripe style="width: 100%" v-loading="loading" element-loading-text="拼命加载中"
-                element-loading-spinner="el-icon-loading" max-height="400">
-        <el-table-column prop="taskCode" label="任务编码" width="180"/>
+                element-loading-spinner="el-icon-loading" max-height="580">
+        <el-table-column prop="taskCode" label="任务编码" width="120"/>
         <el-table-column prop="taskName" label="任务名称" width="280"/>
-        <el-table-column prop="appName" label="所属应用" width="140"/>
-        <el-table-column :formatter="getRunType" prop="runType" label="运行模式" width="160"/>
-        <el-table-column :formatter="executeTimeFormat" prop="executeTime" label="执行时间" width="200"/>
-        <el-table-column label="任务状态" width="160">
+        <el-table-column prop="appName" label="所属应用" width="120"/>
+        <el-table-column :formatter="getRunType" prop="runType" label="运行模式" width="140"/>
+        <el-table-column :formatter="executeTimeFormat" prop="executeTime" label="执行时间" width="150"/>
+        <el-table-column label="任务状态" width="120">
           <template slot-scope="scope">
             <el-tag :type="getTypeClass(scope.row.taskStatus)"
                     disable-transitions="true">{{ scope.row.taskStatus | taskStatusFormat }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="owner" label="负责人" width="160"/>
-        <el-table-column :formatter="modifyTimeFormat" prop="modifyTime" label="更新时间" width="160"/>
-        <el-table-column fixed="right" label="操作" width="150">
+        <el-table-column prop="owner" label="负责人" width="130"/>
+        <el-table-column :formatter="modifyTimeFormat" prop="modifyTime" label="更新时间" width="150"/>
+        <el-table-column label="操作">
           <template slot-scope="scope">
             <el-row>
               <el-col>
                 <el-tooltip class="item" effect="dark" content="执行" placement="bottom">
-                  <el-button @click="runTask(scope.row)" type="primary" icon="el-icon-s-promotion" circle size="small"/>
+                  <el-button @click="runTask(scope.row)" type="success" icon="el-icon-s-promotion" circle size="small"/>
                 </el-tooltip>
                 <el-tooltip class="item" effect="dark" :content="getTaskStatusDesc(scope.row.taskStatus)"
                             placement="bottom">
-                  <el-button @click="changeTaskStatus(scope.row)" type="primary" :icon="getIcon(scope.row.taskStatus)"
-                             circle size="small"/>
+                  <el-button @click="changeTaskStatus(scope.row)" :type="scope.row.taskStatus === 2 ? 'info' : 'primary'"
+                             :icon="getIcon(scope.row.taskStatus)" circle size="small" :disabled="scope.row.taskStatus === 2"/>
                 </el-tooltip>
                 <el-tooltip class="item" effect="dark" content="日志" placement="bottom">
-                  <el-button @click="auditClick(scope.row)" type="primary" icon="el-icon-document" circle size="small"/>
+                  <el-button @click="auditClick(scope.row)" type="info" icon="el-icon-document" circle size="small"/>
                 </el-tooltip>
               </el-col>
               <el-col>
                 <el-tooltip class="item" effect="dark" content="编辑" placement="bottom">
-                  <el-button @click="auditClick(scope.row)" type="primary" icon="el-icon-edit-outline" circle
+                  <el-button @click="editTask(scope.row)" type="warning" icon="el-icon-edit-outline" circle
                              size="small"/>
                 </el-tooltip>
                 <el-tooltip class="item" effect="dark" content="GLUE" placement="bottom">
-                  <el-button @click="auditClick(scope.row)" type="primary" icon="el-icon-setting" circle size="small"/>
+                  <el-button @click="editGlue(scope.row)" type="warning" icon="el-icon-setting" circle size="small"/>
                 </el-tooltip>
                 <el-tooltip class="item" effect="dark" content="删除" placement="bottom">
                   <el-button @click.native.prevent="deleteRow(scope.$index, tableData)" type="danger"
@@ -110,131 +110,219 @@
       </div>
     </div>
 
-    <!--新增规则-->
-    <el-drawer title="新增规则" :before-close="handleClose" :visible.sync="addDialog" direction="rtl"
-               custom-class="add-glue-drawer" ref="drawer" size="40%">
-      <el-card class="box-card" style="margin-top: -15px;">
+    <!--新增任务-->
+    <el-drawer title="新增任务" :before-close="handleClose" :visible.sync="addDialog" direction="rtl"
+               custom-class="add-task-drawer" ref="drawer" size="40%" :with-header="false">
+      <el-card class="box-card">
         <div slot="header" class="clearfix">
-          <span>规则详情</span>
-          <el-tooltip class="item" effect="dark" content="保存" placement="bottom">
-            <el-button style="float: right" size="small" :loading="updateLoading" icon="el-icon-edit-outline"
-                       type="primary" circle @click="updateGlue"/>
-          </el-tooltip>
+          <span>任务详情</span>
+          <el-button style="float: right" size="medium" icon="el-icon-edit-outline" type="text"
+                     @click="saveTask('taskCreateForm')">保存
+          </el-button>
         </div>
-        <el-row>
-          <el-col :span="4">
-            <div class="text">
-              规则编码：
-            </div>
-          </el-col>
-          <el-col :span="7">
-            <el-input class="col-margin"
-                      v-model="saveForm.glueCode"
-                      clearable>
-            </el-input>
-          </el-col>
-          <el-col :span="4" :offset="2">
-            <div class="text">
-              规则名称：
-            </div>
-          </el-col>
-          <el-col :span="7">
-            <el-input class="col-margin"
-                      v-model="saveForm.glueName"
-                      clearable>
-            </el-input>
-          </el-col>
-        </el-row>
-        <el-row style="margin-top: 30px;">
-          <el-col :span="4">
-            <div class="text">
-              规则类型：
-            </div>
-          </el-col>
-          <el-col :span="7">
-            <el-select v-model="saveForm.glueType" filterable placeholder="请选择" class="col-margin">
-              <el-option
-                v-for="item in taskRunTypes"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
-            </el-select>
-          </el-col>
-          <el-col :span="4" :offset="2">
-            <div class="text">
-              应用编号：
-            </div>
-          </el-col>
-          <el-col :span="7">
-            <el-select v-model="saveForm.appCode" filterable placeholder="请选择" clearable class="col-margin">
+        <el-form :inline="true" :model="taskCreateForm" :rules="createRules" ref="taskCreateForm" label-width="100px"
+                 class="search-form">
+          <el-form-item label="任务名称：" prop="taskName" size="medium">
+            <el-input v-model="taskCreateForm.taskName" clearable placeholder="任务名称"/>
+          </el-form-item>
+          <el-form-item label="所属应用：" prop="appCode" size="medium">
+            <el-select v-model="taskCreateForm.appCode" placeholder="请选择" clearable filterable="true">
               <el-option
                 v-for="item in apps"
                 :key="item.value"
                 :label="item.value"
+                :value="item.code">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="路由策略：" prop="routeStrategy" size="medium">
+            <el-select v-model="taskCreateForm.routeStrategy" placeholder="请选择" clearable>
+              <el-option
+                v-for="item in routeStrategyTypes"
+                :key="item.label"
+                :label="item.label"
                 :value="item.value">
               </el-option>
             </el-select>
-          </el-col>
-        </el-row>
+          </el-form-item>
+          <el-form-item label="执行时间：" prop="executeTime" size="medium">
+            <el-date-picker style="width: 194px;" v-model="taskCreateForm.executeTime" type="datetime"
+                            placeholder="选择执行时间"/>
+          </el-form-item>
+          <el-form-item label="运行模式：" prop="runType" size="medium">
+            <el-select v-model="taskCreateForm.runType" @change="isShowCode" placeholder="请选择" clearable>
+              <el-option
+                v-for="item in taskRunTypes"
+                :key="item.label"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="处理器类：" prop="jobHandler" size="medium">
+            <el-input v-model="taskCreateForm.jobHandler" clearable placeholder="任务实现的beanName"/>
+          </el-form-item>
+          <el-form-item label="阻塞策略：" prop="blockStrategy" size="medium">
+            <el-select v-model="taskCreateForm.blockStrategy" placeholder="请选择">
+              <el-option
+                v-for="item in blockStrategyTypes"
+                :key="item.label"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="子任务Ids：" prop="subTaskIds" size="medium">
+            <el-input v-model="taskCreateForm.subTaskIds" clearable placeholder="子任务id(多个逗号隔开)"/>
+          </el-form-item>
+          <el-form-item label="任务超时：" prop="taskTimeOut" size="medium">
+            <el-input-number style="width: 194px;" v-model="taskCreateForm.taskTimeOut" clearable/>
+          </el-form-item>
+          <el-form-item label="重试次数：" prop="retryTimes" size="medium">
+            <el-input-number style="width: 194px;" v-model="taskCreateForm.retryTimes" clearable/>
+          </el-form-item>
+          <el-form-item label="负责人：" prop="owner" size="medium">
+            <el-input v-model="taskCreateForm.owner" clearable placeholder="任务负责人"/>
+          </el-form-item>
+          <el-form-item label="报警邮箱：" prop="mail" size="medium">
+            <el-input v-model="taskCreateForm.mail" clearable placeholder="mail地址(多个逗号隔开)"/>
+          </el-form-item>
+          <el-form-item label="任务参数：" prop="taskParam" size="medium">
+            <el-input style="width: 500px;" rows="3" type="textarea" resize="none" v-model="taskCreateForm.taskParam"
+                      clearable size="medium" placeholder="任务参数，执行任务时获取到参数配置信息"/>
+          </el-form-item>
+        </el-form>
       </el-card>
-      <el-card class="box-card" style="margin-top: 10px">
+      <el-card class="box-card" style="margin-top: 10px" v-show="isShow">
         <div slot="header" class="clearfix">
-          <span>规则代码</span>
-          <el-tooltip class="item" effect="dark" content="校验" placement="bottom">
-            <el-button style="float: right" size="small" :loading="checkLoading" icon="el-icon-check" type="primary"
-                       circle @click="checkCode"/>
-          </el-tooltip>
+          <span>任务代码</span>
+          <el-button style="float: right" size="medium" :loading="checkLoading" icon="el-icon-thumb" type="text"
+                     @click="checkCode">校验
+          </el-button>
         </div>
-        <codemirror :options="cmOptions" v-model="saveForm.source"></codemirror>
+        <codemirror :options="cmOptions" v-model="taskCreateForm.source"></codemirror>
       </el-card>
     </el-drawer>
 
-    <!--编辑规则-->
-    <el-drawer title="规则编辑" :before-close="handleClose" :visible.sync="auditDialog" direction="rtl"
-               custom-class="audit-glue-drawer" ref="drawer" size="40%">
+    <!--编辑任务-->
+    <el-drawer title="更新任务" :before-close="handleClose" :visible.sync="editDialog" direction="rtl"
+               custom-class="audit-task-drawer" ref="drawer" size="40%" :with-header="false">
       <el-card class="box-card">
         <div slot="header" class="clearfix">
-          <span>规则详情</span>
-          <el-tooltip class="item" effect="dark" content="保存" placement="bottom">
-            <el-button style="float: right" size="small" :loading="updateLoading" icon="el-icon-edit-outline"
-                       type="primary" circle @click="updateGlue"/>
-          </el-tooltip>
+          <span>任务详情</span>
+          <el-button style="float: right" size="medium" icon="el-icon-edit-outline" type="text"
+                     @click="updateTask('taskUpdateForm')">保存
+          </el-button>
         </div>
-        <el-row>
-          <el-col :span="11">
-            <div class="text">
-              规则编码：{{ auditRule.ruleCode }}
-            </div>
-          </el-col>
-          <el-col :span="11" :offset="2">
-            <div class="text">
-              规则名称：{{ auditRule.ruleName }}
-            </div>
-          </el-col>
-        </el-row>
-        <el-row style="margin-top: 30px;">
-          <el-col :span="11">
-            <div class="text">
-              规则版本：{{ auditRule.version }}
-            </div>
-          </el-col>
-          <el-col :span="11" :offset="2">
-            <div class="text">
-              规则类型：{{ auditRule.ruleType | taskRunTypeFormat }}
-            </div>
-          </el-col>
-        </el-row>
+        <el-form :inline="true" :model="taskUpdateForm" :rules="createRules" ref="taskUpdateForm" label-width="100px"
+                 class="search-form">
+          <el-form-item label="任务名称：" prop="taskName" size="medium">
+            <el-input v-model="taskUpdateForm.taskName" clearable placeholder="任务名称"/>
+          </el-form-item>
+          <el-form-item label="所属应用：" prop="appCode" size="medium">
+            <el-select v-model="taskUpdateForm.appCode" placeholder="请选择" clearable filterable="true">
+              <el-option
+                v-for="item in apps"
+                :key="item.value"
+                :label="item.value"
+                :value="item.code">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="路由策略：" prop="routeStrategy" size="medium">
+            <el-select v-model="taskUpdateForm.routeStrategy" placeholder="请选择" clearable>
+              <el-option
+                v-for="item in routeStrategyTypes"
+                :key="item.label"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="执行时间：" prop="executeTime" size="medium">
+            <el-date-picker style="width: 194px;" v-model="taskUpdateForm.executeTime" type="datetime"
+                            placeholder="选择执行时间"/>
+          </el-form-item>
+          <el-form-item label="运行模式：" prop="runType" size="medium">
+            <el-select v-model="taskUpdateForm.runType" @change="isShowCode" placeholder="请选择" clearable>
+              <el-option
+                v-for="item in taskRunTypes"
+                :key="item.label"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="处理器类：" prop="jobHandler" size="medium">
+            <el-input v-model="taskUpdateForm.jobHandler" clearable placeholder="任务实现的beanName"/>
+          </el-form-item>
+          <el-form-item label="阻塞策略：" prop="blockStrategy" size="medium">
+            <el-select v-model="taskUpdateForm.blockStrategy" placeholder="请选择">
+              <el-option
+                v-for="item in blockStrategyTypes"
+                :key="item.label"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="子任务Ids：" prop="subTaskIds" size="medium">
+            <el-input v-model="taskUpdateForm.subTaskIds" clearable placeholder="子任务id(多个逗号隔开)"/>
+          </el-form-item>
+          <el-form-item label="任务超时：" prop="taskTimeOut" size="medium">
+            <el-input-number style="width: 194px;" v-model="taskUpdateForm.taskTimeOut" clearable/>
+          </el-form-item>
+          <el-form-item label="重试次数：" prop="retryTimes" size="medium">
+            <el-input-number style="width: 194px;" v-model="taskUpdateForm.retryTimes" clearable/>
+          </el-form-item>
+          <el-form-item label="负责人：" prop="owner" size="medium">
+            <el-input v-model="taskUpdateForm.owner" clearable placeholder="任务负责人"/>
+          </el-form-item>
+          <el-form-item label="报警邮箱：" prop="mail" size="medium">
+            <el-input v-model="taskUpdateForm.mail" clearable placeholder="mail地址(多个逗号隔开)"/>
+          </el-form-item>
+          <el-form-item label="任务参数：" prop="taskParam" size="medium">
+            <el-input style="width: 500px;" rows="3" type="textarea" resize="none" v-model="taskUpdateForm.taskParam"
+                      clearable size="medium" placeholder="任务参数，执行任务时获取到参数配置信息"/>
+          </el-form-item>
+        </el-form>
       </el-card>
-      <el-card class="box-card" style="margin-top: 10px">
+      <el-card class="box-card" style="margin-top: 8px" v-show="isShow">
         <div slot="header" class="clearfix">
-          <span>规则代码</span>
-          <el-tooltip class="item" effect="dark" content="校验" placement="bottom">
-            <el-button style="float: right" size="small" :loading="checkLoading" icon="el-icon-check" type="primary"
-                       circle @click="checkCode"/>
-          </el-tooltip>
+          <span>任务代码</span>
+          <el-button style="float: right" size="medium" :loading="checkLoading" icon="el-icon-thumb" type="text"
+                     @click="checkCode">校验
+          </el-button>
         </div>
-        <codemirror :options="cmOptions" v-model="auditRule.source"></codemirror>
+        <codemirror :options="cmOptions" v-model="taskUpdateForm.source"></codemirror>
+      </el-card>
+    </el-drawer>
+
+    <!--编辑任务代码-->
+    <el-drawer title="编辑任务代码" :before-close="handleClose" :visible.sync="editCodeDialog" direction="ttb"
+               custom-class="edit-glue-drawer" ref="drawer" size="85%" :with-header="false">
+      <el-card class="box-card edit-code">
+        <div slot="header" class="clearfix">
+          <span style="font-size: 26px;font-weight: bolder;color: white;">WebIDE | </span>
+          <span style="color: white;">GLUE模式任务：{{ editCode.taskName }} | 版本号：{{ editCode.version }}</span>
+          <el-button style="float: right; margin-left: 20px; color: white;" size="medium" :loading="checkLoading"
+                     icon="el-icon-edit-outline" type="text" @click="checkCode">保存
+          </el-button>
+          <el-button style="float: right; margin-left: 40px; color: white;" size="medium" :loading="checkLoading"
+                     icon="el-icon-thumb"
+                     type="text" @click="checkCode">校验
+          </el-button>
+          <el-dropdown style="float: right; margin-top: 8px;" size="medium" @command="selectVersion">
+            <span class="el-dropdown-link">
+              版本回溯<i class="el-icon-caret-bottom el-icon--right"></i>
+            </span>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item v-for="item in historyVersionList" :command="item.id" :key="index">{{ item.version }}
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+        </div>
+        <codemirror :options="cmOptions" v-model="editCode.source"/>
       </el-card>
     </el-drawer>
   </div>
@@ -255,7 +343,7 @@ import moment from 'moment';
 import qs from 'qs';
 
 export default {
-  name: "Glue",
+  name: "TimeTask",
 
   data() {
     return {
@@ -264,13 +352,14 @@ export default {
         pageSize: 10,
         totalNum: 0,
       },
+      isShow: false,
+      editCodeDialog: false,
       addDialog: false,
-      auditDialog: false,
+      editDialog: false,
       loading: false,
       addCode: '',
       auditCode: '',
       checkLoading: false,
-      updateLoading: false,
       saveForm: {
         glueCode: '',
         glueName: '',
@@ -297,16 +386,111 @@ export default {
         taskName: '',
         appCode: ''
       },
+      editCode: {},
+      historyVersionList: [
+        {
+          id: 1,
+          version: '1.0.0'
+        }, {
+          id: 2,
+          version: '1.0.1'
+        }
+      ],
 
-      auditRule: {},
+      taskCreateForm: {},
+
+      taskUpdateForm: {},
 
       taskRunTypes: [{
-        value: '1',
+        value: 1,
         label: 'GLUE模式'
       }, {
-        value: '2',
+        value: 2,
         label: 'BEAN模式'
       }],
+
+      createRules: {
+        taskName: [
+          {required: true, message: '请输入活动名称', trigger: 'blur'},
+          {min: 3, max: 63, message: '长度在 3 到 63 个字符', trigger: 'blur'}
+        ],
+        appCode: [
+          {required: true, message: '请选择所属应用', trigger: 'change'}
+        ],
+        routeStrategy: [
+          {required: true, message: '请选择路由策略', trigger: 'change'}
+        ],
+        executeTime: [
+          {type: 'date', required: true, message: '请选择时间', trigger: 'change'}
+        ],
+        runType: [
+          {required: true, message: '请选择运行模式', trigger: 'change'}
+        ],
+        jobHandler: [
+          {required: true, message: '请输入处理器类', trigger: 'blur'}
+        ],
+        blockStrategy: [
+          {required: true, message: '请选择阻塞策略', trigger: 'change'}
+        ],
+        retryTimes: [
+          {required: true, message: '请输入重试次数', trigger: 'blur'}
+        ],
+        taskTimeOut: [
+          {required: true, message: '请输入任务超时时长', trigger: 'blur'}
+        ],
+        owner: [
+          {required: true, message: '请输入负责人', trigger: 'blur'},
+          {min: 1, max: 15, message: '长度在 1 到 15 个字符', trigger: 'blur'}
+        ]
+      },
+
+      blockStrategyTypes: [
+        {
+          value: 1,
+          label: '单机串行'
+        },
+        {
+          value: 2,
+          label: '丢弃后续调度'
+        },
+        {
+          value: 3,
+          label: '覆盖之前调度'
+        }
+      ],
+
+      routeStrategyTypes: [
+        {
+          value: 1,
+          label: '第一个'
+        }, {
+          value: 2,
+          label: '最后一个'
+        }, {
+          value: 3,
+          label: '轮询'
+        }, {
+          value: 4,
+          label: '随机'
+        }, {
+          value: 5,
+          label: '一致性HASH'
+        }, {
+          value: 6,
+          label: '最不经常使用'
+        }, {
+          value: 7,
+          label: '最近最久未使用'
+        }, {
+          value: 8,
+          label: '故障转移'
+        }, {
+          value: 9,
+          label: '忙碌转移'
+        }, {
+          value: 10,
+          label: '分片广播'
+        }],
 
       tableData: [
         {
@@ -322,9 +506,17 @@ export default {
           taskName: '每日核销',
           appName: 'mall',
           runType: 1,
-          executeTime: 1598581001200,
+          executeTime: '2020-08-28 10:20:41',
           taskStatus: 1,
           owner: '星翼'
+        }, {
+          taskCode: 'aa_2',
+          taskName: '每日核销',
+          appName: 'mall',
+          runType: 1,
+          executeTime: '2020-08-28 10:20:41',
+          taskStatus: 2,
+          owner: '千均'
         }
       ],
 
@@ -347,11 +539,12 @@ export default {
       return runTypeObj[indexType];
     },
     taskStatusFormat(code) {
-      const runTypeObj = {
-        1: '启用',
-        0: '暂停',
+      const runStatusObj = {
+        1: '待执行',
+        0: '已暂停',
+        2: '已执行'
       };
-      return runTypeObj[code];
+      return runStatusObj[code];
     }
   },
   methods: {
@@ -362,12 +555,16 @@ export default {
       };
       return runTypeObj[row.runType];
     },
+    isShowCode(code) {
+      this.isShow = code === 1;
+    },
     getTaskStatus(row) {
-      const runTypeObj = {
-        1: '启用',
-        0: '暂停',
+      const runStatusObj = {
+        1: '待执行',
+        0: '已暂停',
+        2: '已执行'
       };
-      return runTypeObj[row.taskStatus];
+      return runStatusObj[row.taskStatus];
     },
     getTaskStatusDesc(code) {
       if (code === 1) {
@@ -375,7 +572,7 @@ export default {
       } else if (code === 0) {
         return '启用';
       } else {
-        return '未知';
+        return '已执行';
       }
     },
     getIcon(code) {
@@ -390,6 +587,8 @@ export default {
         return 'success';
       } else if (code === 0) {
         return 'danger';
+      } else if (code === 2) {
+        return 'info';
       } else {
         return '';
       }
@@ -402,6 +601,18 @@ export default {
     },
     dateFormat(date) {
       return moment(date).format('YYYY-MM-DD HH:mm:ss');
+    },
+    editTask(row) {
+      this.taskUpdateForm = row;
+      this.editDialog = true;
+      this.isShowCode(row.runType);
+    },
+    editGlue(row) {
+      this.editCode = row;
+      this.editCodeDialog = true;
+    },
+    selectVersion(row) {
+      alert(row.id)
     },
     getAllApps() {
       this.$axios.get('app/apps')
@@ -464,7 +675,7 @@ export default {
     },
     auditClick(row) {
       this.auditRule = row;
-      this.auditDialog = true;
+      this.editDialog = true;
     },
 
     checkCode() {
@@ -495,11 +706,22 @@ export default {
       })
     },
 
-    updateGlue() {
-      this.updateLoading = true;
-      setTimeout(() => {
-        this.updateLoading = false;
-      }, 2000);
+    saveTask(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+        } else {
+          return false;
+        }
+      });
+    },
+
+    updateTask(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+        } else {
+          return false;
+        }
+      });
     },
 
     handleSizeChange(val) {
@@ -526,12 +748,7 @@ export default {
 }
 </script>
 
-<style scoped>
-
-.text {
-  font-size: 14px;
-  color: gray;
-}
+<style>
 
 .item {
   margin-bottom: 18px;
@@ -541,15 +758,35 @@ export default {
   margin: 0 2px;
 }
 
-.col-margin {
-  margin-top: -4px;
-}
-
 .breadcrumb {
   padding: 10px;
   border-radius: 5px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .1);
   background-color: #f2f2f2;
+}
+
+.el-dropdown-link {
+  cursor: pointer;
+  color: white;
+  font-weight: bolder;
+}
+.el-icon-caret-bottom {
+  font-size: 12px;
+}
+
+.box-card {
+  margin: 0 0 0 0;
+}
+.edit-code .el-card__header {
+  background-color: #1876d2 !important;
+}
+
+.edit-code .el-card__body {
+  height: 720px;
+}
+
+.edit-code .CodeMirror {
+  height: 740px;
 }
 
 </style>

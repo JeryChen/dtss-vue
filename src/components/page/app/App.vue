@@ -32,7 +32,10 @@
     <div class="container">
       <div class="data-title">
         <el-icon class="el-icon-s-data"/>
-        <span>数据列表</span>
+        数据列表<span style="font-weight: bolder;font-size: larger; margin-left: 50px; color: #3a8ee6">
+        <el-icon class="el-icon-s-platform"/> 调度中心部署机器地址：
+      </span>
+        <el-tag type="success">172.23.45.412:8080</el-tag>
         <el-tooltip class="item" effect="dark" content="添加" placement="bottom">
           <el-button style="float: right;margin-top: -3px;" @click="addDialogShow"
                      type="primary" icon="el-icon-plus" circle/>
@@ -43,7 +46,7 @@
         <el-table-column type="index" label="序号" width="100"/>
         <el-table-column prop="appCode" label="应用编码" width="160"/>
         <el-table-column prop="appName" label="应用名称" width="160"/>
-        <el-table-column :formatter="registryTypeFormat" prop="registryType" label="注册方式" width="100"/>
+        <el-table-column :formatter="registryTypeFormat" prop="registryType" label="注册方式" width="160"/>
         <el-table-column prop="address" label="注册地址" width="400">
           <template slot-scope="props">
             <el-tag v-if="props.row.address" disable-transitions
@@ -53,9 +56,9 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :formatter="dateFormat" prop="createTime" label="创建时间" width="140"/>
-        <el-table-column prop="creator" label="创建人" width="120"/>
-        <el-table-column fixed="right" label="操作" width="120">
+        <el-table-column :formatter="dateFormat" prop="createTime" label="创建时间" width="160"/>
+        <el-table-column prop="creator" label="创建人" width="140"/>
+        <el-table-column label="操作">
           <template slot-scope="scope">
             <el-tooltip class="item" effect="dark" content="编辑" placement="bottom">
               <el-button @click="handleClick(scope.row)" type="primary" icon="el-icon-edit" circle size="small"/>
@@ -142,7 +145,7 @@ import moment from 'moment';
 import qs from 'qs';
 
 export default {
-  name: "Apps",
+  name: "App",
 
   data() {
     return {
@@ -156,7 +159,14 @@ export default {
       auditDialog: false,
       confirmLoading: false,
       formLabelWidth: '100px',
-      tableData: [],
+      tableData: [{
+        appCode: 'mall',
+        appName: '商城首页',
+        registryType: 1,
+        address: '192.168.255.255:9999,192.168.255.255:9999,192.168.255.255:9999,192.168.255.255:9999,192.168.255.255:9999,192.168.255.255:9999',
+        createTime: '2020-12-28 12:00:00',
+        creator: '星翼'
+      }],
       ruleForm: {
         appCode: '',
         appName: '',
