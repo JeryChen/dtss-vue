@@ -25,8 +25,8 @@
         <el-form-item label="任务名称：" prop="taskName">
           <el-input v-model="searchForm.taskName" clearable></el-input>
         </el-form-item>
-        <el-form-item label="所属应用：" prop="appCode">
-          <el-select v-model="searchForm.appCode" placeholder="请选择" clearable filterable="true">
+        <el-form-item label="所属应用：" prop="appName">
+          <el-select v-model="searchForm.appName" placeholder="请选择" clearable filterable="true">
             <el-option
               v-for="item in apps"
               :key="item.value"
@@ -125,8 +125,8 @@
           <el-form-item label="任务名称：" prop="taskName" size="medium">
             <el-input v-model="taskCreateForm.taskName" clearable placeholder="任务名称"/>
           </el-form-item>
-          <el-form-item label="所属应用：" prop="appCode" size="medium">
-            <el-select v-model="taskCreateForm.appCode" placeholder="请选择" clearable filterable="true">
+          <el-form-item label="所属应用：" prop="appName" size="medium">
+            <el-select v-model="taskCreateForm.appName" placeholder="请选择" clearable filterable="true">
               <el-option
                 v-for="item in apps"
                 :key="item.value"
@@ -219,8 +219,8 @@
           <el-form-item label="任务名称：" prop="taskName" size="medium">
             <el-input v-model="taskUpdateForm.taskName" clearable placeholder="任务名称"/>
           </el-form-item>
-          <el-form-item label="所属应用：" prop="appCode" size="medium">
-            <el-select v-model="taskUpdateForm.appCode" placeholder="请选择" clearable filterable="true">
+          <el-form-item label="所属应用：" prop="appName" size="medium">
+            <el-select v-model="taskUpdateForm.appName" placeholder="请选择" clearable filterable="true">
               <el-option
                 v-for="item in apps"
                 :key="item.value"
@@ -364,7 +364,7 @@ export default {
         glueCode: '',
         glueName: '',
         glueType: '',
-        appCode: '',
+        appName: '',
         source: ''
       },
       cmOptions: {
@@ -384,7 +384,7 @@ export default {
         bizCode: '',
         taskCode: '',
         taskName: '',
-        appCode: ''
+        appName: ''
       },
       editCode: {},
       historyVersionList: [
@@ -414,7 +414,7 @@ export default {
           {required: true, message: '请输入活动名称', trigger: 'blur'},
           {min: 3, max: 63, message: '长度在 3 到 63 个字符', trigger: 'blur'}
         ],
-        appCode: [
+        appName: [
           {required: true, message: '请选择所属应用', trigger: 'change'}
         ],
         routeStrategy: [
@@ -643,12 +643,12 @@ export default {
           const bizCode = this.searchForm.bizCode;
           const taskCode = this.searchForm.taskCode;
           const taskName = this.searchForm.taskName;
-          const appCode = this.searchForm.appCode;
+          const appName = this.searchForm.appName;
           const pageNo = this.pageParams.pageNo;
           const pageSize = this.pageParams.pageSize;
           this.loading = true;
           this.$axios.get('/glue/list', {
-            params: {bizCode, taskCode, taskName, appCode, pageNo, pageSize}
+            params: {bizCode, taskCode, taskName, appName, pageNo, pageSize}
           }).then(response => {
             if (response.data.code === 1) {
               this.tableData = [];

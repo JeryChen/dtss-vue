@@ -15,7 +15,7 @@
           <el-input v-model="searchForm.taskCode" clearable></el-input>
         </el-form-item>
         <el-form-item label="应用：">
-          <el-select v-model="searchForm.appCode" filterable placeholder="请选择" clearable filterable=true>
+          <el-select v-model="searchForm.appName" filterable placeholder="请选择" clearable filterable=true>
             <el-option
               v-for="item in apps"
               :key="item.value"
@@ -170,7 +170,7 @@ export default {
       }],
       searchForm: {
         taskCode: '',
-        appCode: '',
+        appName: '',
         taskRunStatus: '',
         executeTimeInterval: ''
       },

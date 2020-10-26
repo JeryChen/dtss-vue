@@ -23,7 +23,7 @@
           <el-input v-model="searchForm.taskName" clearable></el-input>
         </el-form-item>
         <el-form-item label="所属应用：">
-          <el-select v-model="searchForm.appCode" placeholder="请选择" clearable filterable="true">
+          <el-select v-model="searchForm.appName" placeholder="请选择" clearable filterable="true">
             <el-option
               v-for="item in apps"
               :key="item.value"
@@ -143,8 +143,8 @@
           <el-form-item label="任务名称：" prop="taskName" size="medium">
             <el-input v-model="taskCreateForm.taskName" clearable placeholder="任务名称"/>
           </el-form-item>
-          <el-form-item label="所属应用：" prop="appCode" size="medium">
-            <el-select v-model="taskCreateForm.appCode" placeholder="请选择" clearable filterable="true">
+          <el-form-item label="所属应用：" prop="appName" size="medium">
+            <el-select v-model="taskCreateForm.appName" placeholder="请选择" clearable filterable="true">
               <el-option
                 v-for="item in apps"
                 :key="item.value"
@@ -235,8 +235,8 @@
           <el-form-item label="任务名称：" prop="taskName" size="medium">
             <el-input v-model="taskUpdateForm.taskName" clearable placeholder="任务名称"/>
           </el-form-item>
-          <el-form-item label="所属应用：" prop="appCode" size="medium">
-            <el-select v-model="taskUpdateForm.appCode" placeholder="请选择" clearable filterable="true">
+          <el-form-item label="所属应用：" prop="appName" size="medium">
+            <el-select v-model="taskUpdateForm.appName" placeholder="请选择" clearable filterable="true">
               <el-option
                 v-for="item in apps"
                 :key="item.value"
@@ -396,7 +396,7 @@ export default {
       searchForm: {
         taskCode: '',
         taskName: '',
-        appCode: ''
+        appName: ''
       },
 
       taskCreateForm: {},
@@ -423,7 +423,7 @@ export default {
           {required: true, message: '请输入活动名称', trigger: 'blur'},
           {min: 3, max: 63, message: '长度在 3 到 63 个字符', trigger: 'blur'}
         ],
-        appCode: [
+        appName: [
           {required: true, message: '请选择所属应用', trigger: 'change'}
         ],
         routeStrategy: [
@@ -509,7 +509,7 @@ export default {
         {
           taskCode: 'aa_1',
           taskName: '每日对账',
-          appCode: 1,
+          appName: 1,
           appName: 'mall',
           runType: 1,
           cron: '0 0 10 1 1/1 ?',
@@ -720,7 +720,7 @@ export default {
             {
               taskCode: 'aa_1',
               taskName: '每日对账',
-              appCode: 1,
+              appName: 1,
               appName: 'mall',
               runType: 2,
               cron: '0 0 10 1 1/1 ?',
@@ -729,7 +729,7 @@ export default {
             }, {
               taskCode: 'aa_2',
               taskName: '每日核销',
-              appCode: 1,
+              appName: 1,
               appName: 'mall',
               runType: 1,
               cron: '0 0 10 1 1/2 ?',
@@ -740,7 +740,7 @@ export default {
         }, {
           taskCode: 'aa_2',
           taskName: '每日核销',
-          appCode: 1,
+          appName: 1,
           appName: 'mall',
           runType: 1,
           cron: '0 0 10 1 1/2 ?',
@@ -749,7 +749,7 @@ export default {
         }, {
           taskCode: 'aa_3',
           taskName: '每日退回',
-          appCode: 1,
+          appName: 1,
           appName: 'mall',
           runType: 1,
           cron: '10 10 10 11 11/12 ?',
@@ -851,12 +851,12 @@ export default {
     searchTaskList() {
       const ruleCode = this.searchForm.taskCode;
       const ruleName = this.searchForm.taskName;
-      const appCode = this.searchForm.appCode;
+      const appName = this.searchForm.appName;
       const pageNo = this.pageParams.pageNo;
       const pageSize = this.pageParams.pageSize;
       this.loading = true;
       this.$axios.get('/glue/list', {
-        params: {ruleCode, ruleName, ruleType, appCode, appName, pageNo, pageSize}
+        params: {ruleCode, ruleName, ruleType, appName, appName, pageNo, pageSize}
       }).then(response => {
         if (response.data.code === 1) {
           this.tableData = [];

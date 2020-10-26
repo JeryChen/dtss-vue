@@ -12,7 +12,7 @@
       </div>
       <el-form :inline="true" :model="searchForm" class="search-form">
         <el-form-item label="应用编码：">
-          <el-select v-model="searchForm.appCode" filterable placeholder="请选择" clearable>
+          <el-select v-model="searchForm.appName" filterable placeholder="请选择" clearable>
             <el-option
               v-for="item in apps"
               :key="item.value"
@@ -44,8 +44,8 @@
       <el-table :data="tableData" stripe style="width: 100%" v-loading="loading" element-loading-text="拼命加载中"
                 element-loading-spinner="el-icon-loading" max-height="400">
         <el-table-column type="index" label="序号" width="100"/>
-        <el-table-column prop="appCode" label="应用编码" width="160"/>
-        <el-table-column prop="appName" label="应用名称" width="160"/>
+        <el-table-column prop="appName" label="应用编码" width="160"/>
+        <el-table-column prop="appDesc" label="应用名称" width="160"/>
         <el-table-column :formatter="registryTypeFormat" prop="registryType" label="注册方式" width="160"/>
         <el-table-column prop="address" label="注册地址" width="400">
           <template slot-scope="props">
@@ -86,8 +86,8 @@
                custom-class="add-app-drawer" ref="auditDrawer">
       <div class="add-app-drawer-content">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" :label-width="formLabelWidth">
-          <el-form-item label="应用编号：" prop="appCode">
-            <el-input v-model="ruleForm.appCode"/>
+          <el-form-item label="应用编号：" prop="appName">
+            <el-input v-model="ruleForm.appName"/>
           </el-form-item>
           <el-form-item label="应用名称：" prop="appName">
             <el-input v-model="ruleForm.appName"/>
@@ -113,8 +113,8 @@
                custom-class="add-app-drawer" ref="drawer">
       <div class="add-app-drawer-content">
         <el-form :model="addRuleForm" :rules="rules" ref="ruleForm" :label-width="formLabelWidth">
-          <el-form-item label="应用编号：" prop="appCode">
-            <el-input v-model="addRuleForm.appCode"/>
+          <el-form-item label="应用编号：" prop="appName">
+            <el-input v-model="addRuleForm.appName"/>
           </el-form-item>
           <el-form-item label="应用名称：" prop="appName">
             <el-input v-model="addRuleForm.appName"/>
@@ -160,39 +160,39 @@ export default {
       confirmLoading: false,
       formLabelWidth: '100px',
       tableData: [{
-        appCode: 'mall',
-        appName: '商城首页',
+        appName: 'mall',
+        appDesc: '商城首页',
         registryType: 1,
         address: '192.168.255.255:9999,192.168.255.255:9999,192.168.255.255:9999,192.168.255.255:9999,192.168.255.255:9999,192.168.255.255:9999',
         createTime: '2020-12-28 12:00:00',
         creator: '星翼'
       }],
       ruleForm: {
-        appCode: '',
         appName: '',
+        appDesc: '',
         address: '',
         registryType: '',
       },
       apps: [],
       addRuleForm: {
-        appCode: '',
         appName: '',
+        appDesc: '',
         address: '',
         registryType: 1,
       },
       rules: {
-        appCode: [
+        appName: [
           {required: true, message: '应用编号不能为空', trigger: 'blur'},
           {min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur'}
         ],
-        appName: [
+        appDesc: [
           {required: true, message: '应用名称不能为空', trigger: 'blur'},
           {min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur'}
         ]
       },
       searchForm: {
-        appCode: '',
-        appName: ''
+        appName: '',
+        appDesc: ''
       }
     }
   },
@@ -209,8 +209,8 @@ export default {
     addDialogShow() {
       this.dialog = true;
       this.addRuleForm = {
-        appCode: '',
         appName: '',
+        appDesc: '',
         address: '',
         registryType: 1,
       }
@@ -245,8 +245,8 @@ export default {
     },
     addApp() {
       let params = qs.stringify({
-        appCode: this.addRuleForm.appCode,
         appName: this.addRuleForm.appName,
+        appDesc: this.addRuleForm.appDesc,
         registryType: this.addRuleForm.registryType,
         address: this.addRuleForm.address
       });
@@ -275,8 +275,8 @@ export default {
     updateApp() {
       let params = qs.stringify({
         id: this.ruleForm.id,
-        appCode: this.ruleForm.appCode,
         appName: this.ruleForm.appName,
+        appDesc: this.ruleForm.appDesc,
         registryType: this.ruleForm.registryType,
         address: this.ruleForm.address
       });
@@ -326,13 +326,13 @@ export default {
       })
     },
     searchSubmit() {
-      const appCode = this.searchForm.appCode;
       const appName = this.searchForm.appName;
+      const appDesc = this.searchForm.appDesc;
       const pageNo = this.pageParams.pageNo;
       const pageSize = this.pageParams.pageSize;
       this.loading = true;
       this.$axios.get('/app/list', {
-        params: {appCode, appName, pageNo, pageSize}
+        params: {appName, appDesc, pageNo, pageSize}
       }).then(response => {
         if (response.data.code === 1) {
           this.tableData = [];
