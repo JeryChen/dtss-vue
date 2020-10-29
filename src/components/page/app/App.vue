@@ -22,7 +22,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="应用名称：">
-          <el-input v-model="searchForm.appName" clearable></el-input>
+          <el-input v-model="searchForm.appDesc" clearable></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="searchSubmit" icon="el-icon-search">查询</el-button>
@@ -220,7 +220,7 @@ export default {
       if (row.registryType === 1) {
         registryType = '自动注册';
       } else if (row.registryType === 2) {
-        registryType = '手动注册';
+        registryType = '手动录入';
       }
       return registryType;
     },

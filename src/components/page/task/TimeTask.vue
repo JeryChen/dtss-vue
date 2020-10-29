@@ -82,14 +82,14 @@
                 </el-tooltip>
               </el-col>
               <el-col>
-                <el-tooltip class="item" effect="dark" content="编辑" placement="bottom">
+                <el-tooltip effect="dark" content="编辑" placement="bottom">
                   <el-button @click="editTask(scope.row)" type="warning" icon="el-icon-edit-outline" circle
                              size="small"/>
                 </el-tooltip>
-                <el-tooltip class="item" effect="dark" content="GLUE" placement="bottom">
+                <el-tooltip effect="dark" content="GLUE" placement="bottom">
                   <el-button @click="editGlue(scope.row)" type="warning" icon="el-icon-setting" circle size="small"/>
                 </el-tooltip>
-                <el-tooltip class="item" effect="dark" content="删除" placement="bottom">
+                <el-tooltip effect="dark" content="删除" placement="bottom">
                   <el-button @click.native.prevent="deleteRow(scope.$index, tableData)" type="danger"
                              icon="el-icon-delete" circle size="small"/>
                 </el-tooltip>
@@ -751,7 +751,7 @@ export default {
 <style>
 
 .item {
-  margin-bottom: 18px;
+  margin-bottom: 10px;
 }
 
 .box-card {

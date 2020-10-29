@@ -26,9 +26,9 @@
           <el-select v-model="searchForm.appName" placeholder="请选择" clearable filterable="true">
             <el-option
               v-for="item in apps"
-              :key="item.value"
-              :label="item.value"
-              :value="item.code">
+              :key="item.appName"
+              :label="item.appName"
+              :value="item.appName">
             </el-option>
           </el-select>
         </el-form-item>
@@ -50,7 +50,7 @@
                 element-loading-spinner="el-icon-loading" max-height="580">
         <el-table-column type="expand" class="expanded-column-out">
           <template slot-scope="props">
-            <el-table :data="props.row.subTaskList" style="width: 100%"
+            <el-table :data="props.row.subCronTaskList" style="width: 100%"
                       element-loading-spinner="el-icon-loading" max-height="200" highlight-current-row="true">
               <el-table-column prop="taskCode" label="子任务编码" width="120"/>
               <el-table-column prop="taskName" label="子任务名称" width="260"/>
@@ -100,15 +100,15 @@
                 </el-tooltip>
               </el-col>
               <el-col>
-                <el-tooltip class="item" effect="dark" content="编辑" placement="bottom">
+                <el-tooltip effect="dark" content="编辑" placement="bottom">
                   <el-button @click="editTask(scope.row)" type="warning" icon="el-icon-setting" circle
                              size="small"/>
                 </el-tooltip>
-                <el-tooltip class="item" effect="dark" content="GLUE" placement="bottom">
+                <el-tooltip effect="dark" content="GLUE" placement="bottom">
                   <el-button @click="editGlue(scope.row)" type="warning" icon="el-icon-edit-outline" circle
                              size="small"/>
                 </el-tooltip>
-                <el-tooltip class="item" effect="dark" content="删除" placement="bottom">
+                <el-tooltip effect="dark" content="删除" placement="bottom">
                   <el-button @click.native.prevent="deleteRow(scope.$index, tableData)" type="danger"
                              icon="el-icon-delete" circle size="small"/>
                 </el-tooltip>
@@ -147,9 +147,9 @@
             <el-select v-model="taskCreateForm.appName" placeholder="请选择" clearable filterable="true">
               <el-option
                 v-for="item in apps"
-                :key="item.value"
-                :label="item.value"
-                :value="item.code">
+                :key="item.appName"
+                :label="item.appName"
+                :value="item.appName">
               </el-option>
             </el-select>
           </el-form-item>
@@ -238,10 +238,10 @@
           <el-form-item label="所属应用：" prop="appName" size="medium">
             <el-select v-model="taskUpdateForm.appName" placeholder="请选择" clearable filterable="true">
               <el-option
-                v-for="item in apps"
-                :key="item.value"
-                :label="item.value"
-                :value="item.code">
+                v-for="item in appName"
+                :key="item.appName"
+                :label="item.appName"
+                :value="item.appName">
               </el-option>
             </el-select>
           </el-form-item>
@@ -323,7 +323,8 @@
           <el-button style="float: right; margin-left: 20px; color: white;" size="medium" :loading="checkLoading"
                      icon="el-icon-edit-outline" type="text" @click="checkCode">保存
           </el-button>
-          <el-button style="float: right; margin-left: 40px; color: white;" size="medium" :loading="checkLoading" icon="el-icon-thumb"
+          <el-button style="float: right; margin-left: 40px; color: white;" size="medium" :loading="checkLoading"
+                     icon="el-icon-thumb"
                      type="text" @click="checkCode">校验
           </el-button>
           <el-dropdown style="float: right; margin-top: 8px;" size="medium" @command="selectVersion">
@@ -389,10 +390,7 @@ export default {
         matchBrackets: true,
         extraKeys: {"Ctrl": "autocomplete"}
       },
-      apps: [{
-        code: 1,
-        value: 'mall'
-      }],
+      apps: [],
       searchForm: {
         taskCode: '',
         taskName: '',
@@ -505,263 +503,12 @@ export default {
         }
       ],
 
-      tableData: [
-        {
-          taskCode: 'aa_1',
-          taskName: '每日对账',
-          appName: 1,
-          appName: 'mall',
-          runType: 1,
-          cron: '0 0 10 1 1/1 ?',
-          taskStatus: 0,
-          owner: '杰瑞',
-          version: '1.0.0',
-          source: 'package com.yangt.detail.biz.item.module.template;\n' +
-            '\n' +
-            'import com.google.common.collect.Lists;\n' +
-            'import com.google.common.collect.Maps;\n' +
-            'import com.yangt.detail.biz.convertor.SupplierStoreModuleViewConvert;\n' +
-            'import com.yangt.detail.common.constant.Constants;\n' +
-            'import com.yangt.detail.common.dto.item.RedPillDTO;\n' +
-            'import com.yangt.detail.common.dto.item.detail.module.SupplierStoreModuleDTO;\n' +
-            'import com.yangt.detail.common.enums.RedPillSceneEnum;\n' +
-            'import lombok.AllArgsConstructor;\n' +
-            'import lombok.Data;\n' +
-            'import lombok.EqualsAndHashCode;\n' +
-            'import lombok.NoArgsConstructor;\n' +
-            'import org.apache.commons.lang3.StringUtils;\n' +
-            'import org.springframework.stereotype.Component;\n' +
-            '\n' +
-            'import java.util.List;\n' +
-            'import java.util.Map;\n' +
-            'import java.util.Objects;\n' +
-            '\n' +
-            '/**\n' +
-            ' * <功能介绍><br>\n' +
-            ' * <p>\n' +
-            ' * <店铺信息模板渲染处理>\n' +
-            ' *\n' +
-            ' * @author xy on 2020/9/24.\n' +
-            ' * @see [相关类/方法]（可选）\n' +
-            ' * @since [产品 /模块版本] （可选）\n' +
-            ' */\n' +
-            '@Component\n' +
-            'public class SupplierStoreTemplate extends AbstractDetailLocalTemplate<SupplierStoreModuleDTO> {\n' +
-            '\n' +
-            '    private static final String VIEW_MODULE_ID = "store_info";\n' +
-            '\n' +
-            '    private static final String CLOSED_STORE_NAME = "供货商家综合评分";\n' +
-            '\n' +
-            '    @Override\n' +
-            '    public ViewWrapper renderToView(SupplierStoreModuleDTO module) {\n' +
-            '        if (Objects.isNull(module)) {\n' +
-            '            return null;\n' +
-            '        }\n' +
-            '\n' +
-            '        SupplierStoreModuleView supplierStoreView = SupplierStoreModuleViewConvert.INSTANCE.map(module);\n' +
-            '        supplierStoreView.setShowTotalScoreStr("综合评分:" + module.getShowTotalScore());\n' +
-            '        if (SupplierStoreModuleDTO.isClose(supplierStoreView.getIsClosed())) {\n' +
-            '            supplierStoreView.setStorePic(Constants.STORE_PIC);\n' +
-            '            supplierStoreView.setStoreName(CLOSED_STORE_NAME);\n' +
-            '        }\n' +
-            '\n' +
-            '        //设置埋点数据\n' +
-            '        supplierStoreView.setRedPill(buildRedPill(module));\n' +
-            '\n' +
-            '        //构建店铺评分信息\n' +
-            '        supplierStoreView.setScoreList(buildStoreScoreList(module));\n' +
-            '\n' +
-            '        return ViewIdentifiableWrapper.of(supplierStoreView).gapFloorBefore();\n' +
-            '    }\n' +
-            '\n' +
-            '    @Override\n' +
-            '    public String getViewModuleId(SupplierStoreModuleDTO module) {\n' +
-            '        return VIEW_MODULE_ID;\n' +
-            '    }\n' +
-            '\n' +
-            '    /**\n' +
-            '     * 构建店铺评分信息\n' +
-            '     *\n' +
-            '     * @param supplierStoreModuleDto 供应商店铺信息\n' +
-            '     * @return 店铺评分信息\n' +
-            '     */\n' +
-            '    private List<StoreScoreView> buildStoreScoreList(SupplierStoreModuleDTO supplierStoreModuleDto) {\n' +
-            '\n' +
-            '        List<StoreScoreView> scoreList = Lists.newArrayList();\n' +
-            '        if (StringUtils.isNotBlank(supplierStoreModuleDto.getShowMatchScore())) {\n' +
-            '            scoreList.add(new StoreScoreView(supplierStoreModuleDto.getMatchScoreRate().compareTo(0D),\n' +
-            '                                             scoreChange(supplierStoreModuleDto.getShowMatchScore()), "货品描述"));\n' +
-            '        }\n' +
-            '        if (StringUtils.isNotBlank(supplierStoreModuleDto.getShowResponseScore())) {\n' +
-            '            scoreList.add(new StoreScoreView(supplierStoreModuleDto.getResponseScoreRate().compareTo(0D),\n' +
-            '                                             scoreChange(supplierStoreModuleDto.getShowResponseScore()), "服务态度"));\n' +
-            '        }\n' +
-            '        if (StringUtils.isNotBlank(supplierStoreModuleDto.getShowDeliveryScore())) {\n' +
-            '            scoreList.add(new StoreScoreView(supplierStoreModuleDto.getDeliveryScoreRate().compareTo(0D),\n' +
-            '                                             scoreChange(supplierStoreModuleDto.getShowDeliveryScore()), "物流服务"));\n' +
-            '        }\n' +
-            '        return scoreList;\n' +
-            '\n' +
-            '    }\n' +
-            '\n' +
-            '    /**\n' +
-            '     * 评分转换\n' +
-            '     *\n' +
-            '     * @param score 分值\n' +
-            '     * @return 转换后分值\n' +
-            '     */\n' +
-            '    private String scoreChange(String score) {\n' +
-            '        return StringUtils.isBlank(score) || Double.valueOf(score).equals(0D) ? "-" : score;\n' +
-            '    }\n' +
-            '\n' +
-            '    /**\n' +
-            '     * 构建埋点信息\n' +
-            '     *\n' +
-            '     * @param module 模块数据\n' +
-            '     * @return 埋点信息\n' +
-            '     */\n' +
-            '    private RedPillDTO buildRedPill(SupplierStoreModuleDTO module) {\n' +
-            '        Map<String, Object> redPillMap = Maps.newHashMap();\n' +
-            '        redPillMap.put("supplier_id", module.getSupplierId());\n' +
-            '        redPillMap.put("supplier_store_id", module.getStoreId());\n' +
-            '        redPillMap.put("item_id", module.getItemId());\n' +
-            '        redPillMap.put("have_batch", module.getIsHasBatch());\n' +
-            '        redPillMap.put("source", module.getSource());\n' +
-            '        return buildRedPillInfo(RedPillSceneEnum.STORE, module.getClientType(), redPillMap);\n' +
-            '    }\n' +
-            '\n' +
-            '    @EqualsAndHashCode(callSuper = true)\n' +
-            '    @Data\n' +
-            '    public static class SupplierStoreModuleView extends AbstractLocalView {\n' +
-            '\n' +
-            '        /**\n' +
-            '         * 回头率\n' +
-            '         */\n' +
-            '        private String returnRate;\n' +
-            '\n' +
-            '        /**\n' +
-            '         * 供应商id\n' +
-            '         */\n' +
-            '        private String supplierId;\n' +
-            '\n' +
-            '        /**\n' +
-            '         * 是否显示查看更多的选项\n' +
-            '         */\n' +
-            '        private Boolean hasMore;\n' +
-            '\n' +
-            '        /**\n' +
-            '         * 店铺首页评分文案, 综合评分:5.0，只用于文字说明\n' +
-            '         */\n' +
-            '        private String showTotalScoreStr;\n' +
-            '\n' +
-            '        /**\n' +
-            '         * 店铺ID\n' +
-            '         */\n' +
-            '        private Long storeId;\n' +
-            '\n' +
-            '        /**\n' +
-            '         * 店铺首页评分文案, 综合评分:5.0, 用于客户端显示星级图案\n' +
-            '         */\n' +
-            '        private String showTotalScore;\n' +
-            '\n' +
-            '        /**\n' +
-            '         * 埋点信息\n' +
-            '         */\n' +
-            '        private RedPillDTO redPill;\n' +
-            '\n' +
-            '        /**\n' +
-            '         * 门店图\n' +
-            '         */\n' +
-            '        private String storePic;\n' +
-            '\n' +
-            '        /**\n' +
-            '         * 店铺评分\n' +
-            '         */\n' +
-            '        private List<StoreScoreView> scoreList;\n' +
-            '\n' +
-            '        /**\n' +
-            '         * 店铺状态，1为关闭，0为开通\n' +
-            '         */\n' +
-            '        private Integer isClosed;\n' +
-            '\n' +
-            '        /**\n' +
-            '         * 店铺名称\n' +
-            '         */\n' +
-            '        private String storeName;\n' +
-            '\n' +
-            '        /**\n' +
-            '         * 店铺背景图\n' +
-            '         */\n' +
-            '        private String backgroundPic;\n' +
-            '    }\n' +
-            '\n' +
-            '    @Data\n' +
-            '    @AllArgsConstructor\n' +
-            '    @NoArgsConstructor\n' +
-            '    public static class StoreScoreView {\n' +
-            '\n' +
-            '        /**\n' +
-            '         * 1 表示上升的箭头，0 表示持平（目前没有），-1 表示下降的箭头\n' +
-            '         */\n' +
-            '        private Integer trendType;\n' +
-            '\n' +
-            '        /**\n' +
-            '         * 匹配的分数\n' +
-            '         */\n' +
-            '        private String matchScore;\n' +
-            '\n' +
-            '        /**\n' +
-            '         * 分数说明\n' +
-            '         */\n' +
-            '        private String scoreDesc;\n' +
-            '    }\n' +
-            '}\n',
-          subTaskList: [
-            {
-              taskCode: 'aa_1',
-              taskName: '每日对账',
-              appName: 1,
-              appName: 'mall',
-              runType: 2,
-              cron: '0 0 10 1 1/1 ?',
-              taskStatus: 0,
-              owner: '杰瑞'
-            }, {
-              taskCode: 'aa_2',
-              taskName: '每日核销',
-              appName: 1,
-              appName: 'mall',
-              runType: 1,
-              cron: '0 0 10 1 1/2 ?',
-              taskStatus: 1,
-              owner: '星翼'
-            }
-          ]
-        }, {
-          taskCode: 'aa_2',
-          taskName: '每日核销',
-          appName: 1,
-          appName: 'mall',
-          runType: 1,
-          cron: '0 0 10 1 1/2 ?',
-          taskStatus: 1,
-          owner: '星翼'
-        }, {
-          taskCode: 'aa_3',
-          taskName: '每日退回',
-          appName: 1,
-          appName: 'mall',
-          runType: 1,
-          cron: '10 10 10 11 11/12 ?',
-          taskStatus: 1,
-          owner: '千均'
-        }
-      ]
+      tableData: []
     }
   },
   created() {
     this.getAllApps();
-    this.searchRule();
+    this.searchTaskList();
   },
   filters: {
     taskRunTypeFormat(indexType) {
@@ -849,19 +596,19 @@ export default {
       })
     },
     searchTaskList() {
-      const ruleCode = this.searchForm.taskCode;
-      const ruleName = this.searchForm.taskName;
+      const taskCode = this.searchForm.taskCode;
+      const taskName = this.searchForm.taskName;
       const appName = this.searchForm.appName;
       const pageNo = this.pageParams.pageNo;
       const pageSize = this.pageParams.pageSize;
       this.loading = true;
-      this.$axios.get('/glue/list', {
-        params: {ruleCode, ruleName, ruleType, appName, appName, pageNo, pageSize}
+      this.$axios.get('/admin/cron-task/pageList', {
+        params: {cronTaskQry: {taskCode, taskName, appName}, pagingParam: {pageNo, pageSize}}
       }).then(response => {
-        if (response.data.code === 1) {
+        if (response.data.success) {
           this.tableData = [];
-          this.tableData = response.data.resultObject ? response.data.resultObject : [];
-          this.pageParams = response.data.pagingQuery;
+          this.tableData = response.data.data ? response.data.data : [];
+          this.pageParams = response.data.pagingParam;
         } else {
           this.$notify.error({
             title: '错误',
@@ -952,10 +699,10 @@ export default {
 }
 </script>
 
-<style >
+<style>
 
 .item {
-  margin-bottom: 18px;
+  margin-bottom: 10px;
 }
 
 .box-card {
@@ -974,6 +721,7 @@ export default {
   color: white;
   font-weight: bolder;
 }
+
 .el-icon-caret-bottom {
   font-size: 12px;
 }
@@ -981,6 +729,7 @@ export default {
 .box-card {
   margin: 0 0 0 0;
 }
+
 .edit-code .el-card__header {
   background-color: #1876d2 !important;
 }
@@ -994,6 +743,6 @@ export default {
 }
 
 .el-table__expanded-cell {
-  background-color: floralwhite;
+  background-color: aliceblue;
 }
 </style>
