@@ -1,9 +1,9 @@
 <template>
   <div class="vSidebar">
-    <div class="sidebar-header">
+    <div class="sidebar-header" @click="$router.push('/data-market')" style="cursor: pointer;">
       <div class="collapse-btn" v-model="collapse">
         <img src="../../assets/images/logo.png" width="30" height="30">
-        <span style="margin-left: 20px;" v-if="!collapse">Distribute Scheduler</span>
+        <i style="margin-left: 10px;" v-if="!collapse">Distribute Scheduler</i>
       </div>
     </div>
     <el-menu class="sidebar-el-menu" :default-active="onRoutes" :collapse="collapse" background-color="#ffffff"
@@ -66,6 +66,7 @@ export default {
         {
           icon: 'el-icon-paperclip',
           title: '任务管理',
+          index: '',
           subs: [{
             icon: 'el-icon-time',
             index: 'time-task',
@@ -121,7 +122,7 @@ export default {
   box-sizing: border-box;
   height: 64px;
   font-size: 22px;
-  background-color: #005eb6;
+  background-color: #009bf2;
 }
 
 .vSidebar {

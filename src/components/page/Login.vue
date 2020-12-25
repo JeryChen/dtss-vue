@@ -65,7 +65,7 @@
         this.$refs[formName].validate((valid) => {
           if (valid) {
             localStorage.setItem('username', this.ruleForm.username)
-            this.$router.push("/index");
+            this.$router.push("/data-market");
           } else {
             return false;
           }

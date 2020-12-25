@@ -23,12 +23,12 @@
           <el-input v-model="searchForm.taskName" clearable></el-input>
         </el-form-item>
         <el-form-item label="所属应用：">
-          <el-select v-model="searchForm.appName" placeholder="请选择" clearable filterable="true">
+          <el-select v-model="searchForm.appId" placeholder="请选择" clearable filterable="true">
             <el-option
               v-for="item in apps"
               :key="item.appName"
               :label="item.appName"
-              :value="item.appName">
+              :value="item.appId">
             </el-option>
           </el-select>
         </el-form-item>
@@ -394,7 +394,7 @@ export default {
       searchForm: {
         taskCode: '',
         taskName: '',
-        appName: ''
+        appId: ''
       },
 
       taskCreateForm: {},
@@ -573,13 +573,13 @@ export default {
       return moment(row.modifyTime).format('YYYY-MM-DD HH:mm:ss');
     },
     getAllApps() {
-      this.$axios.get('app/apps')
+      this.$axios.get('/admin/app/allAppNames')
         .then(response => {
-          if (response.data.code === 1) {
+          if (response.data.success) {
             this.apps = [];
-            if (response.data.resultObject) {
-              for (let item in response.data.resultObject) {
-                this.apps.push({'value': response.data.resultObject[item]})
+            if (response.data.data) {
+              for (let item in response.data.data) {
+                this.apps.push({'appName': response.data.data[item].appName, 'appId': response.data.data[item].id})
               }
             }
           } else {
@@ -596,14 +596,14 @@ export default {
       })
     },
     searchTaskList() {
-      const taskCode = this.searchForm.taskCode;
-      const taskName = this.searchForm.taskName;
-      const appName = this.searchForm.appName;
-      const pageNo = this.pageParams.pageNo;
-      const pageSize = this.pageParams.pageSize;
+      const taskCode = this.searchForm.taskCode ? this.searchForm.taskCode : null;
+      const taskName = this.searchForm.taskName ? this.searchForm.taskName : null;
+      const appId = this.searchForm.appId ? this.searchForm.appId : null;
+      const pageNo = this.pageParams.pageNo ? this.pageParams.pageNo : null;
+      const pageSize = this.pageParams.pageSize ? this.pageParams.pageSize : null;
       this.loading = true;
       this.$axios.get('/admin/cron-task/pageList', {
-        params: {cronTaskQry: {taskCode, taskName, appName}, pagingParam: {pageNo, pageSize}}
+        params: {taskCode, taskName, appId, pageNo, pageSize}
       }).then(response => {
         if (response.data.success) {
           this.tableData = [];
